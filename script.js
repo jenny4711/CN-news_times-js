@@ -2,7 +2,7 @@
 // Qapg-UqPwZcLdzQmb8Kkg9fBRhdF4M7CiXJ1ulAehKY
 // e9e6b1a12aa54dd5bff096fc2f99ee54
 let news = [];
-let news2 = [];
+
 let page = 1;
 let total_page = 1;
 
@@ -45,7 +45,7 @@ const getNews = async () => {
 
 const getLatestnews = async () => {
   url = new URL(
-    `https://newsapi.org/v2/top-headlines?country=us&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
+    `https://newsapi.org/v2/top-headlines?country=us&pageSize=5&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
   );
 
   await getNews();
@@ -55,7 +55,7 @@ const getNewsByTopic = async (evt) => {
   let topic = evt.target.textContent.toLowerCase();
   console.log(topic);
   url = new URL(
-    `https://newsapi.org/v2/top-headlines?category=${topic}&country=us&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
+    `https://newsapi.org/v2/top-headlines?category=${topic}&country=us&pageSize=5&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
   );
 
   await getNews();
@@ -65,7 +65,7 @@ const getNewsByKeyword = async () => {
   let keyword = document.getElementById("search-input").value;
 
   url = new URL(
-    `https://newsapi.org/v2/everything?q=${keyword}&from=2023-03-27&sortBy=popularity&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
+    `https://newsapi.org/v2/everything?q=${keyword}&from=2023-03-27&sortBy=popularity&pageSize=5&apiKey=e9e6b1a12aa54dd5bff096fc2f99ee54`
   );
 
   await getNews();
@@ -94,23 +94,6 @@ const render = () => {
   document.getElementById("news-board").innerHTML = newsHTML;
 };
 
-const displayList = (items, rows_per_page, page) => {
-  page--;
-  let start = rows_per_page * page;
-  let end = start + rows_per_page;
-  let pgItems = items.slice(start, end);
-  console.log(pgItems);
-  items = pgItems;
-  console.log(items);
-
-  // for (let i = 0; i < pgItems.length; i++) {
-  //   let item = pgItems[i];
-  //  news2=item
-  //   console.log(news2,'items')
-  //   render()
-  // }
-};
-
 const pagination = () => {
   let pagenationHTML = ``;
 
@@ -127,6 +110,14 @@ const pagination = () => {
   console.log(first, "first");
 
   // first page
+  pagenationHTML += ` <li class="page-item">
+  <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${
+    page - 7
+  })">
+    <span class=${page == 1 ? "hide" : ""} aria-hidden="true">&laquo;</span>
+  </a>
+</li>`;
+
   pagenationHTML += ` <li class="page-item">
     <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${
       page - 1
@@ -146,10 +137,19 @@ const pagination = () => {
      <span class=${page == 8 ? "hide" : ""} aria-hidden="true">&gt;</span>
    </a>
  </li>`;
+
+  pagenationHTML += `<li class="page-item">
+ <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(${
+   page + 7
+ })">
+   <span class=${page == 8 ? "hide" : ""} aria-hidden="true">&raquo;</span>
+ </a>
+</li>`;
+
   // first~last page print
 
   // ---------------------------------------------
-  displayList(news, last, page);
+  // displayList(news, last, page);
   render();
 
   document.querySelector(".pagination").innerHTML = pagenationHTML;
@@ -159,6 +159,13 @@ const moveToPage = async (pageNum) => {
   // 이동하고싶은 페이지 알고
   page = pageNum;
   // 이동하고싶은 페이지를 가지고 api 호출
+  if (page < 1) {
+    page = 8;
+  } else if (page > 8) {
+    page = 1;
+  } else {
+    page;
+  }
   await getNews();
   //
 };
